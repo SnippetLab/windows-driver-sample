@@ -1,0 +1,89 @@
+;
+; WindowsDriverSample.inf
+;
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=Sample ; TODO: edit Class
+ClassGuid={78A1C341-4539-11d3-B88D-00C04FAD5171} ; TODO: edit ClassGuid
+Provider=%ManufacturerName%
+CatalogFile=WindowsDriverSample.cat
+DriverVer = 04/28/2018,19.9.4.523
+
+[DestinationDirs]
+DefaultDestDir = 12
+WindowsDriverSample_Device_CoInstaller_CopyFiles = 11
+
+; ================= Class section =====================
+
+[ClassInstall32]
+Addreg=SampleClassReg
+
+[SampleClassReg]
+HKR,,,0,%ClassName%
+HKR,,Icon,,-5
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+WindowsDriverSample.sys  = 1,,
+;
+
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%ManufacturerName%=Standard,NTx86
+
+[Standard.NTx86]
+%WindowsDriverSample.DeviceDesc%=WindowsDriverSample_Device, Root\WindowsDriverSample ; TODO: edit hw-id
+
+[WindowsDriverSample_Device.NT]
+CopyFiles=Drivers_Dir
+
+[Drivers_Dir]
+WindowsDriverSample.sys
+
+;-------------- Service installation
+[WindowsDriverSample_Device.NT.Services]
+AddService = WindowsDriverSample,%SPSVCINST_ASSOCSERVICE%, WindowsDriverSample_Service_Inst
+
+; -------------- WindowsDriverSample driver install sections
+[WindowsDriverSample_Service_Inst]
+DisplayName    = %WindowsDriverSample.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\WindowsDriverSample.sys
+
+;
+;--- WindowsDriverSample_Device Coinstaller installation ------
+;
+
+[WindowsDriverSample_Device.NT.CoInstallers]
+AddReg=WindowsDriverSample_Device_CoInstaller_AddReg
+CopyFiles=WindowsDriverSample_Device_CoInstaller_CopyFiles
+
+[WindowsDriverSample_Device_CoInstaller_AddReg]
+;
+
+
+[WindowsDriverSample_Device_CoInstaller_CopyFiles]
+;
+
+
+[WindowsDriverSample_Device.NT.Wdf]
+KmdfService =  WindowsDriverSample, WindowsDriverSample_wdfsect
+[WindowsDriverSample_wdfsect]
+KmdfLibraryVersion = 1.15
+
+[Strings]
+SPSVCINST_ASSOCSERVICE= 0x00000002
+ManufacturerName="<Your manufacturer name>" ;TODO: Replace with your manufacturer name
+ClassName="Samples" ; TODO: edit ClassName
+DiskName = "WindowsDriverSample Installation Disk"
+WindowsDriverSample.DeviceDesc = "WindowsDriverSample Device"
+WindowsDriverSample.SVCDESC = "WindowsDriverSample Service"
